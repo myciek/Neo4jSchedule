@@ -1,0 +1,24 @@
+{% extends "shared/_layout.html" %}
+{% block title %}Home{% endblock %}
+{% block main_content %}
+<div class="main">
+    <div class="form-wrapper">
+        <form method="post">
+            <h2>Profile</h2>
+            {% for info in user_profile %}
+                <input class="form-control" type="text" name="name" placeholder="Imie i Nazwisko" value="{{ info.name }}">
+                <input class="form-control" type="text" name="email" placeholder="Email" value="{{ info.email }}">
+                <label class="form-control"for = "is_teacher">Nauczyciel</label>
+                {% if info.is_teacher %}
+                    <input class="form-control" type="checkbox" name="is_teacher" checked disabled>
+                {% else %}
+                    <input class="form-control" type="checkbox" name="is_teacher" disabled >
+                {% endif %}
+            {% endfor %}
+            <div class="actions">
+                <button type="submit" class="bt btn-info btn-sm">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
