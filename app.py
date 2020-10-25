@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, session, url_for, flash, request
 from data.db_session import db_auth
-from services.accounts_service import create_user, login_user, get_profile
+from services.accounts_service import create_user, login_user, get_profile, update_user
 import os
 
 app = Flask(__name__)
@@ -31,7 +31,7 @@ def register_post():
     if not name or not email or not password or not confirm:
         flash("Please populate all the registration fields", "error")
         return render_template("accounts/register.html", name=name, email=email, is_teacher=is_teacher,
-                               password=password,confirm=confirm)
+                               password=password, confirm=confirm)
     if password != confirm:
         flash("Passwords do not match")
         return render_template("accounts/register.html", name=name, email=email, is_teacher=is_teacher)
@@ -80,8 +80,11 @@ def profile_get():
 def profile_post():
     if "usr" in session:
         usr = session["usr"]
-        session["usr"] = usr
-        user_profile = get_profile(usr)
+        name = request.form["name"]
+        email = request.form["email"]
+        updated_user = update_user(name, email, usr)
+        session["usr"] = updated_user["email"]
+        user_profile = get_profile(session["usr"])
         return render_template("accounts/index.html", user_profile=user_profile)
     else:
         return redirect(url_for("login_get"))
