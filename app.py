@@ -1,7 +1,9 @@
 from flask import Flask, render_template, redirect, session, url_for, flash, request
 from data.db_session import db_auth
 from services.accounts_service import create_user, login_user, get_profile, update_user
+from services.lessons_services import get_lesson_initial_info
 import os
+
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -92,9 +94,7 @@ def profile_post():
 
 @app.route('/lessons', methods=['GET'])
 def lessons_get():
-    info = {
-
-    }
+    info = get_lesson_initial_info()
     return render_template("lessons/index.html", info=info)
 
 
