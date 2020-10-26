@@ -58,3 +58,12 @@ def get_profile(usr: str) -> Optional[User]:
     user_profile = graph.run(
         f"MATCH (x:user) WHERE x.email='{usr}' RETURN x.name as name, x.is_teacher as is_teacher, x.email as email")
     return user_profile
+
+
+def get_teachers_names() -> list:
+    teachers = graph.run(
+        f"MATCH (x:user) WHERE x.is_teacher=true RETURN x.name as name"
+    ).data()
+
+    names = [x["name"] for x in teachers]
+    return names

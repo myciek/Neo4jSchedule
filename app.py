@@ -2,8 +2,10 @@ from flask import Flask, render_template, redirect, session, url_for, flash, req
 from data.db_session import db_auth
 from services.accounts_service import create_user, login_user, get_profile, update_user
 from services.lessons_services import get_lesson_initial_info
+from services.classes import TypeEnum
 import os
 
+from services.studies_types_services import create_studies_type
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -96,6 +98,29 @@ def profile_post():
 def lessons_get():
     info = get_lesson_initial_info()
     return render_template("lessons/index.html", info=info)
+
+
+@app.route('/studies_type', methods=['GET'])
+def studies_type_get():
+    info = {
+        "types": TypeEnum._member_names_
+    }
+    return render_template("lessons/studies_type.html", info=info)
+
+
+@app.route('/studies_type', methods=['POST'])
+def studies_type_post():
+    name = request.form["name"]
+    abbreviation = request.form["abbreviation"]
+    type = request.form["type"]
+    studies_type = create_studies_type(name, abbreviation, type)
+    if not studies_type:
+        flash("Studia takiego typu już instnieją")
+        info = {
+            "types": TypeEnum._member_names_
+        }
+        return render_template("lessons/studies_type.html", info=info)
+    return redirect(url_for("lessons_get"))
 
 
 @app.route('/accounts/logout')

@@ -17,7 +17,6 @@ class User(GraphObject):
 
 class StudiesType(GraphObject):
     __primarylabel__ = "studies_type"
-    __primarykey__ = "abbreviation"
     name = Property()
     abbreviation = Property()
     type = Property()
