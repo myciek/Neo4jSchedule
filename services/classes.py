@@ -56,6 +56,7 @@ class Lesson(GraphObject):
     group = Property()
     studies_type = Property()
     duration = Property()
+    start_time = Property()
 
     lesson_type = RelatedTo("LessonType")
     teacher = RelatedTo("User")

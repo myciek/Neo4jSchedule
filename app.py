@@ -90,6 +90,14 @@ def profile_post():
         return redirect(url_for("login_get"))
 
 
+@app.route('/lessons', methods=['GET'])
+def lessons_get():
+    info = {
+
+    }
+    return render_template("lessons/index.html", info=info)
+
+
 @app.route('/accounts/logout')
 def logout():
     session.pop("usr", None)
