@@ -2,6 +2,7 @@ from data.db_session import db_auth
 from typing import Optional
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
 from services.classes import User
+from py2neo import Node, NodeMatcher
 
 graph = db_auth()
 
@@ -21,6 +22,15 @@ def create_user(name: str, email: str, is_teacher: bool, password: str) -> Optio
     user.hashed_password = hash_text(password)
     graph.create(user)
     return user
+
+
+def update_user(name: str, email: str, original_email: str) -> Optional[User]:
+    matcher = NodeMatcher(graph)
+    updated_user = matcher.match("user", email=original_email).first()
+    updated_user["email"] = email
+    updated_user["name"] = name
+    graph.push(updated_user)
+    return updated_user
 
 
 def hash_text(text: str) -> str:
@@ -45,7 +55,15 @@ def login_user(email: str, password: str) -> Optional[User]:
 
 
 def get_profile(usr: str) -> Optional[User]:
-    # user = User.match(graph, f"{usr}").first()
     user_profile = graph.run(
-        f"MATCH (x:user) WHERE x.email='{usr}' RETURN x.name as name, x.is_teacher as is_teacher, x.email as email").data()
+        f"MATCH (x:user) WHERE x.email='{usr}' RETURN x.name as name, x.is_teacher as is_teacher, x.email as email")
     return user_profile
+
+
+def get_teachers_names() -> list:
+    teachers = graph.run(
+        f"MATCH (x:user) WHERE x.is_teacher=true RETURN x.name as name"
+    ).data()
+
+    names = [x["name"] for x in teachers]
+    return names

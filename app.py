@@ -1,7 +1,12 @@
 from flask import Flask, render_template, redirect, session, url_for, flash, request
 from data.db_session import db_auth
-from services.accounts_service import create_user, login_user, get_profile
+from services.accounts_service import create_user, login_user, get_profile, update_user
+from services.lesson_types_services import create_lesson_type
+from services.lessons_services import get_lesson_initial_info, create_lesson
+from services.classes import TypeEnum
 import os
+
+from services.studies_types_services import create_studies_type
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -31,7 +36,7 @@ def register_post():
     if not name or not email or not password or not confirm:
         flash("Please populate all the registration fields", "error")
         return render_template("accounts/register.html", name=name, email=email, is_teacher=is_teacher,
-                               password=password,confirm=confirm)
+                               password=password, confirm=confirm)
     if password != confirm:
         flash("Passwords do not match")
         return render_template("accounts/register.html", name=name, email=email, is_teacher=is_teacher)
@@ -62,7 +67,7 @@ def login_post():
         return render_template("accounts/login.html", email=email, password=password)
     usr = request.form["email"]
     session["usr"] = usr
-    return redirect(url_for("profile_get"))
+    return redirect(url_for("lessons_get"))
 
 
 @app.route('/accounts/profile', methods=['GET'])
@@ -80,11 +85,78 @@ def profile_get():
 def profile_post():
     if "usr" in session:
         usr = session["usr"]
-        session["usr"] = usr
-        user_profile = get_profile(usr)
+        name = request.form["name"]
+        email = request.form["email"]
+        updated_user = update_user(name, email, usr)
+        session["usr"] = updated_user["email"]
+        user_profile = get_profile(session["usr"])
         return render_template("accounts/index.html", user_profile=user_profile)
     else:
         return redirect(url_for("login_get"))
+
+
+@app.route('/lessons', methods=['GET'])
+def lessons_get():
+    info = get_lesson_initial_info()
+    return render_template("lessons/index.html", info=info)
+
+
+@app.route('/lessons', methods=['POST'])
+def lessons_post():
+    if "usr" not in session:
+        return redirect(url_for("login_get"))
+    name = request.form["name"]
+    lesson_type = request.form["lesson_type"]
+    start_time = request.form["start_time"]
+    duration = request.form["duration"]
+    frequency = request.form["frequency"]
+    teacher = request.form["teacher"]
+    studies_type = request.form["studies_type"]
+    group = request.form["group"]
+    section = request.form["section"]
+    owner = session["usr"]
+    lesson = create_lesson(name, lesson_type, start_time, duration, frequency, teacher, studies_type, group, section,
+                           owner)
+    return redirect(url_for("lessons_get"))
+
+
+@app.route('/lessons/studies_type', methods=['GET'])
+def studies_type_get():
+    info = {
+        "types": TypeEnum._member_names_
+    }
+    return render_template("lessons/studies_type.html", info=info)
+
+
+@app.route('/lessons/studies_type', methods=['POST'])
+def studies_type_post():
+    name = request.form["name"]
+    abbreviation = request.form["abbreviation"]
+    type = request.form["type"]
+    studies_type = create_studies_type(name, abbreviation, type)
+    if not studies_type:
+        flash("Studia takiego typu już istnieją")
+        info = {
+            "types": TypeEnum._member_names_
+        }
+        return render_template("lessons/studies_type.html", info=info)
+    return redirect(url_for("lessons_get"))
+
+
+@app.route('/lessons/lesson_type', methods=['GET'])
+def lesson_type_get():
+    return render_template("lessons/lesson_type.html")
+
+
+@app.route('/lessons/lesson_type', methods=['POST'])
+def lesson_type_post():
+    name = request.form["name"]
+    color = request.form["color"]
+    lesson_type = create_lesson_type(name, color)
+    if not lesson_type:
+        flash("Nazwa i kolor muszą być unikalne")
+        return render_template("lessons/lesson_type.html")
+    return redirect(url_for("lessons_get"))
 
 
 @app.route('/accounts/logout')

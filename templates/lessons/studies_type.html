@@ -1,0 +1,35 @@
+{% extends "shared/_layout.html" %}
+{% block title %}Kierunek studiów{% endblock %}
+{% block main_content %}
+    <div class="main">
+        <div class="form-wrapper">
+            <form method="POST">
+                <h2>Kierunek studiów</h2>
+                <input class="form-control" type="text" name="name" placeholder="Nazwa" required
+                       value="{{ name }}">
+                <input class="form-control" type="text" name="abbreviation" placeholder="Skrót nazwy" required value="{{ abbreviation }}">
+                <select class="form-control" id="type" name="type">
+                    <option value="" disabled selected>Typ studiów</option>
+                    {% for type in info.types %}
+                        <option value="{{ type }}">{{ type }}</option>
+                    {% endfor %}
+                </select>
+<div class="actions">
+                    <button type="submit" class="bt btn-info btn-sm">Dodaj kierunek studiów</button>
+                </div>
+                <div class="error-msg">
+                    {% if error %}
+                        <div class="error-msg">{{ error }}</div>
+                    {% endif %}
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for msg in messages %}
+                                <p>{{ msg }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
