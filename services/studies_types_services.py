@@ -6,7 +6,7 @@ from services.classes import StudiesType
 graph = db_auth()
 
 
-def find_studies_type(abbreviation: str, type: type):
+def find_studies_type(abbreviation: str, type: str):
     studies_type = graph.run(
         f"MATCH (x:studies_type) WHERE x.abbreviation='{abbreviation}' AND x.type='{type}' RETURN x").data()
     return studies_type

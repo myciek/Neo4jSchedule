@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, session, url_for, flash, request
 from data.db_session import db_auth
 from services.accounts_service import create_user, login_user, get_profile, update_user
+from services.lesson_types_services import create_lesson_type
 from services.lessons_services import get_lesson_initial_info
 from services.classes import TypeEnum
 import os
@@ -100,7 +101,7 @@ def lessons_get():
     return render_template("lessons/index.html", info=info)
 
 
-@app.route('/studies_type', methods=['GET'])
+@app.route('/lessons/studies_type', methods=['GET'])
 def studies_type_get():
     info = {
         "types": TypeEnum._member_names_
@@ -108,7 +109,7 @@ def studies_type_get():
     return render_template("lessons/studies_type.html", info=info)
 
 
-@app.route('/studies_type', methods=['POST'])
+@app.route('/lessons/studies_type', methods=['POST'])
 def studies_type_post():
     name = request.form["name"]
     abbreviation = request.form["abbreviation"]
@@ -120,6 +121,22 @@ def studies_type_post():
             "types": TypeEnum._member_names_
         }
         return render_template("lessons/studies_type.html", info=info)
+    return redirect(url_for("lessons_get"))
+
+
+@app.route('/lessons/lesson_type', methods=['GET'])
+def lesson_type_get():
+    return render_template("lessons/lesson_type.html")
+
+
+@app.route('/lessons/lesson_type', methods=['POST'])
+def lesson_type_post():
+    name = request.form["name"]
+    color = request.form["color"]
+    lesson_type = create_lesson_type(name, color)
+    if not lesson_type:
+        flash("Nazwa i kolor muszą być unikalne")
+        return render_template("lessons/lesson_type.html")
     return redirect(url_for("lessons_get"))
 
 
