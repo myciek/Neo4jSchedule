@@ -15,7 +15,7 @@ graph = db_auth()
 
 @app.route('/')
 def index():
-    return render_template("home/index.html")
+    return redirect(url_for("register_get"))
 
 
 @app.route('/accounts/register', methods=['GET'])
@@ -67,7 +67,7 @@ def login_post():
         return render_template("accounts/login.html", email=email, password=password)
     usr = request.form["email"]
     session["usr"] = usr
-    return redirect(url_for("lessons_get"))
+    return redirect(url_for("calendar_get"))
 
 
 @app.route('/accounts/profile', methods=['GET'])
@@ -119,7 +119,7 @@ def lessons_post():
     owner = session["usr"]
     lesson = create_lesson(name, lesson_type, start_time, end_time, frequency, teacher, studies_type, group, section,
                            owner)
-    return redirect(url_for("lessons_get"))
+    return redirect(url_for("calendar_get"))
 
 
 @app.route('/lessons/studies_type', methods=['GET'])
