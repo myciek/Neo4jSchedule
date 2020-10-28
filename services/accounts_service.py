@@ -1,8 +1,10 @@
-from data.db_session import db_auth
 from typing import Optional
+
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
+from py2neo import NodeMatcher, Relationship
+
+from data.db_session import db_auth
 from services.classes import User
-from py2neo import Node, NodeMatcher
 
 graph = db_auth()
 
@@ -67,3 +69,15 @@ def get_teachers_names() -> list:
 
     names = [x["name"] for x in teachers]
     return names
+
+
+def create_teacher_relationship(lesson_node, teacher):
+    teacher_node = graph.run(f"MATCH (x:user) WHERE x.name='{teacher}' RETURN x").data()
+    relationship = Relationship(lesson_node.__ogm__.node, "IS_TAUGHT_BY", teacher_node[0]["x"])
+    graph.create(relationship)
+
+
+def create_owner_relationship(lesson_node, owner):
+    owner_node = graph.run(f"MATCH (x:user) WHERE x.email='{owner}' RETURN x").data()
+    relationship = Relationship(lesson_node.__ogm__.node, "IS_OWNED_BY", owner_node[0]["x"])
+    graph.create(relationship)

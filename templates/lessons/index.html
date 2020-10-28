@@ -15,8 +15,8 @@
                 </select>
                 <input class="form-control" type="datetime-local" name="start_time" placeholder="Godzina rozpoczęcia"
                        required value="{{ time }}">
-                <input class="form-control" type="time" name="duration" placeholder="Czas trwania" required
-                       value="{{ duration }}">
+                <input class="form-control" type="datetime-local" name="end_time" placeholder="Godzina zakończenia" required
+                       value="{{ end_time }}">
                 <select class="form-control" id="frequency" name="frequency">
                     <option value="" disabled selected>Występowanie</option>
                     {% for type in info.frequency %}
