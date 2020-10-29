@@ -134,6 +134,8 @@ def studies_type_get():
 
 @app.route('/lessons/studies_type', methods=['POST'])
 def studies_type_post():
+    if "usr" not in session:
+        return redirect(url_for("login_get"))
     name = request.form["name"]
     abbreviation = request.form["abbreviation"]
     type = request.form["type"]
@@ -156,6 +158,8 @@ def lesson_type_get():
 
 @app.route('/lessons/lesson_type', methods=['POST'])
 def lesson_type_post():
+    if "usr" not in session:
+        return redirect(url_for("login_get"))
     name = request.form["name"]
     color = request.form["color"]
     lesson_type = create_lesson_type(name, color)
@@ -193,6 +197,8 @@ def data_get():
 
 @app.route('/lessons/<id>', methods=['GET'])
 def lesson_detais_get(id):
+    if "usr" not in session:
+        return redirect(url_for("login_get"))
     lesson = Lesson.match(graph, int(id)).first()
     info = get_lesson_initial_info()
     info["name"] = lesson.name
