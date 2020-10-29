@@ -1,10 +1,10 @@
 {% extends "shared/_layout.html" %}
-{% block title %}Add lesson{% endblock %}
+{% block title %}Dodaj zajęcia{% endblock %}
 {% block main_content %}
     <div class="main">
         <div class="form-wrapper">
             <form method="POST">
-                <h2>Add lesson</h2>
+                <h2>Dodaj zajęcia</h2>
                 <input class="form-control" type="text" name="name" placeholder="Nazwa zajęć" required
                        value="{{ name }}">
                 <select class="form-control" id="lesson_type" name="lesson_type">
@@ -13,10 +13,11 @@
                         <option value="{{ type }}">{{ type }}</option>
                     {% endfor %}
                 </select>
+                <a class="form-control" href="/lessons/lesson_type">Dodaj rodzaj zajęć</a>
                 <input class="form-control" type="datetime-local" name="start_time" placeholder="Godzina rozpoczęcia"
                        required value="{{ time }}">
-                <input class="form-control" type="time" name="duration" placeholder="Czas trwania" required
-                       value="{{ duration }}">
+                <input class="form-control" type="datetime-local" name="end_time" placeholder="Godzina zakończenia" required
+                       value="{{ end_time }}">
                 <select class="form-control" id="frequency" name="frequency">
                     <option value="" disabled selected>Występowanie</option>
                     {% for type in info.frequency %}
@@ -35,6 +36,7 @@
                         <option value="{{ type }}">{{ type }}</option>
                     {% endfor %}
                 </select>
+                <a class="form-control" href="/lessons/studies_type">Dodaj kierunek studiów</a>
                 <input class="form-control" type="text" name="group" placeholder="Grupa" required value="{{ group }}">
                 <input class="form-control" type="text" name="section" placeholder="Sekcja" required
                        value="{{ section }}">

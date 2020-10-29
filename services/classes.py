@@ -11,7 +11,6 @@ class User(GraphObject):
     password = Property()
     hashed_password = Property()
 
-    lessons_taught = RelatedFrom("Lesson", "IS_TAUGHT_BY")
     lessons_own = RelatedFrom("Lesson", "IS_OWNED_BY")
 
 
@@ -20,8 +19,6 @@ class StudiesType(GraphObject):
     name = Property()
     abbreviation = Property()
     type = Property()
-
-    lessons = RelatedFrom("Lesson", "IS_CONDUCTED_FOR")
 
 
 class TypeEnum(Enum):
@@ -44,8 +41,6 @@ class LessonType(GraphObject):
     name = Property()
     color = Property()
 
-    lessons = RelatedFrom("Lesson", "IS_TYPE")
-
 
 class Lesson(GraphObject):
     __primarylabel__ = "lesson"
@@ -54,11 +49,9 @@ class Lesson(GraphObject):
     section = Property()
     group = Property()
     studies_type = Property()
-    duration = Property()
+    end_time = Property()
     start_time = Property()
 
-    lesson_type = RelatedTo("LessonType")
-    teacher = RelatedTo("User")
-    owner = RelatedTo("User")
-    studies_type = RelatedTo("StudiesType")
-
+    lesson_type = RelatedTo("LessonType", "IS_TYPE")
+    teacher = RelatedTo("User", "IS_TAUGHT_BY")
+    studies_type = RelatedTo("StudiesType", "IS_CONDUCTED_FOR")
