@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, session, url_for, flash, req
 from data.db_session import db_auth
 from services.accounts_service import create_user, login_user, get_profile, update_user, find_user
 from services.lesson_types_services import create_lesson_type
-from services.lessons_services import get_lesson_initial_info, create_lesson
+from services.lessons_services import get_lesson_initial_info, create_lesson, update_lesson
 from services.classes import TypeEnum, User, Lesson
 import os
 import json
@@ -172,7 +172,7 @@ def calendar_get():
     return render_template("calendar/calendar.html")
 
 
-@app.route('/data')
+@app.route('/data', methods=['GET'])
 def data_get():
     data = []
     user = User.match(graph, session["usr"]).first()
@@ -191,8 +191,8 @@ def data_get():
     return json.dumps(data)
 
 
-@app.route('/lessons/<id>')
-def lesson_detail_get(id):
+@app.route('/lessons/<id>', methods=['GET'])
+def lesson_detais_get(id):
     lesson = Lesson.match(graph, int(id)).first()
     info = get_lesson_initial_info()
     info["name"] = lesson.name
@@ -211,8 +211,26 @@ def lesson_detail_get(id):
     for studies_type in lesson.studies_type:
         info["selected_studies_type"] = f"{studies_type.abbreviation} {studies_type.type}"
 
-    print(info)
     return render_template("lessons/lesson_details.html", info=info)
+
+
+@app.route('/lessons/<id>', methods=['POST'])
+def lesson_details_post(id):
+    if "usr" not in session:
+        return redirect(url_for("login_get"))
+    name = request.form["name"]
+    lesson_type = request.form["lesson_type"]
+    start_time = request.form["start_time"]
+    end_time = request.form["end_time"]
+    frequency = request.form["frequency"]
+    teacher = request.form["teacher"]
+    studies_type = request.form["studies_type"]
+    group = request.form["group"]
+    section = request.form["section"]
+
+    lesson = update_lesson(name, lesson_type, start_time, end_time, frequency, teacher, studies_type, group, section,
+                           id)
+    return redirect(url_for("calendar_get"))
 
 
 @app.route('/accounts/logout')

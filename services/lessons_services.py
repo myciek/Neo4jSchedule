@@ -29,6 +29,29 @@ def create_lesson(name: str, lesson_type: str, start_time: str, end_time: str, f
     return lesson
 
 
+def update_lesson(name: str, lesson_type: str, start_time: str, end_time: str, frequency: str, teacher: str,
+                  studies_type: str, group: str, section: str, id: str) -> Optional[Lesson]:
+    lesson = Lesson.match(graph, int(id)).first()
+    lesson.name = name
+    lesson.start_time = start_time
+    lesson.end_time = end_time
+    lesson.frequency = frequency
+    lesson.group = group
+    lesson.section = section
+
+    lesson.lesson_type.clear()
+    lesson.studies_type.clear()
+    lesson.teacher.clear()
+
+    graph.push(lesson)
+
+    create_lesson_type_relationship(lesson, lesson_type)
+    create_studies_type_relationship(lesson, studies_type)
+    create_teacher_relationship(lesson, teacher)
+
+    return lesson
+
+
 def get_lesson_initial_info() -> dict:
     info = {
         "lesson_types": get_lesson_type_names(),
