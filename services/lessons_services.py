@@ -11,11 +11,6 @@ from .studies_types_services import get_studies_type_names, create_studies_type_
 graph = db_auth()
 
 
-def create_relationship(lesson: Lesson, relation: str, partner: str):
-    relationship = Relationship(lesson.__ogm__.node, relation, partner[0]["x"])
-    graph.create(relationship)
-
-
 def create_lesson(name: str, lesson_type: str, start_time: str, end_time: str, frequency: str, teacher: str,
                   studies_type: str, group: str, section: str, owner: str) -> Optional[Lesson]:
     lesson = Lesson()

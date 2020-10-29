@@ -38,5 +38,5 @@ def get_studies_type_names() -> list:
         f"MATCH (x:studies_type) RETURN x.abbreviation as abbreviation, x.type as type"
     ).data()
 
-    names = [f'{x["abbreviation"]}  {x["type"]}' for x in studies]
+    names = [f'{x["abbreviation"]} {x["type"]}' for x in studies]
     return names

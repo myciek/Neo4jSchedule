@@ -3,7 +3,7 @@ from data.db_session import db_auth
 from services.accounts_service import create_user, login_user, get_profile, update_user, find_user
 from services.lesson_types_services import create_lesson_type
 from services.lessons_services import get_lesson_initial_info, create_lesson
-from services.classes import TypeEnum, User
+from services.classes import TypeEnum, User, Lesson
 import os
 import json
 from services.studies_types_services import create_studies_type
@@ -183,11 +183,36 @@ def data_get():
                 "title": f"{lesson.name} {lesson_type.name}",
                 "start": lesson.start_time,
                 "end": lesson.end_time,
-                "color": lesson_type.color
+                "color": lesson_type.color,
+                "url": f"http://127.0.0.1:5000/lessons/{lesson.__primaryvalue__}"
             }
             data.append(lesson_data)
 
     return json.dumps(data)
+
+
+@app.route('/lessons/<id>')
+def lesson_detail_get(id):
+    lesson = Lesson.match(graph, int(id)).first()
+    info = get_lesson_initial_info()
+    info["name"] = lesson.name
+    info["start_time"] = lesson.start_time
+    info["end_time"] = lesson.end_time
+    info["group"] = lesson.group
+    info["section"] = lesson.section
+    info["selected_frequency"] = lesson.frequency
+
+    for lesson_type in lesson.lesson_type:
+        info["selected_lesson_type"] = lesson_type.name
+
+    for teacher in lesson.teacher:
+        info["selected_teacher"] = teacher.name
+
+    for studies_type in lesson.studies_type:
+        info["selected_studies_type"] = f"{studies_type.abbreviation} {studies_type.type}"
+
+    print(info)
+    return render_template("lessons/lesson_details.html", info=info)
 
 
 @app.route('/accounts/logout')
