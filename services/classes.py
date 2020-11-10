@@ -1,13 +1,16 @@
-from py2neo.ogm import GraphObject, Property, RelatedTo, RelatedFrom
+from py2neo.ogm import GraphObject, Property, RelatedTo, RelatedFrom, Label
 from enum import Enum
 
 
 class User(GraphObject):
     __primarylabel__ = "user"
     __primarykey__ = "email"
+    student = Label()
+    teacher = Label()
+    teacher_for_approval = Label()
+    admin = Label()
     name = Property()
     email = Property()
-    is_teacher = Property()
     password = Property()
     hashed_password = Property()
 

@@ -20,7 +20,10 @@ def create_user(name: str, email: str, is_teacher: bool, password: str) -> Optio
     user = User()
     user.name = name
     user.email = email
-    user.is_teacher = is_teacher
+    if is_teacher:
+        user.teacher_for_approval = True
+    else:
+        user.student = True
     user.hashed_password = hash_text(password)
     graph.create(user)
     return user
@@ -58,13 +61,13 @@ def login_user(email: str, password: str) -> Optional[User]:
 
 def get_profile(usr: str) -> Optional[User]:
     user_profile = graph.run(
-        f"MATCH (x:user) WHERE x.email='{usr}' RETURN x.name as name, x.is_teacher as is_teacher, x.email as email")
+        f"MATCH (x:user) WHERE x.email='{usr}' RETURN x.name as name, x.email as email")
     return user_profile
 
 
 def get_teachers_names() -> list:
     teachers = graph.run(
-        f"MATCH (x:user) WHERE x.is_teacher=true RETURN x.name as name"
+        f"MATCH (x:user:Teacher) RETURN x.name as name"
     ).data()
 
     names = [x["name"] for x in teachers]
