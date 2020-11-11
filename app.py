@@ -1,6 +1,7 @@
 from flask import Flask, render_template, redirect, session, url_for, flash, request
 from data.db_session import db_auth
-from services.accounts_service import create_user, login_user, get_profile, update_user, find_user
+from services.accounts_service import create_user, login_user, get_profile, update_user, find_user, is_admin, \
+    get_teachers_for_approval_names, approve_teachers
 from services.lesson_types_services import create_lesson_type
 from services.lessons_services import get_lesson_initial_info, create_lesson, update_lesson
 from services.classes import TypeEnum, User, Lesson
@@ -74,6 +75,8 @@ def login_post():
 def profile_get():
     if "usr" in session:
         usr = session["usr"]
+        if is_admin(usr):
+            return redirect(url_for("admin_get"))
         session["usr"] = usr
         user_profile = get_profile(usr)
         return render_template("accounts/index.html", user_profile=user_profile)
@@ -91,6 +94,32 @@ def profile_post():
         session["usr"] = updated_user["email"]
         user_profile = get_profile(session["usr"])
         return render_template("accounts/index.html", user_profile=user_profile)
+    else:
+        return redirect(url_for("login_get"))
+
+
+@app.route('/accounts/admin', methods=['GET'])
+def admin_get():
+    if "usr" in session:
+        if is_admin(session["usr"]):
+            teachers = get_teachers_for_approval_names()
+            return render_template("accounts/admin.html", teachers=teachers)
+        else:
+            return redirect(url_for("profile_get"))
+    else:
+        return redirect(url_for("login_get"))
+
+
+@app.route('/accounts/admin', methods=['POST'])
+def admin_post():
+    if "usr" in session:
+        if is_admin(session["usr"]):
+            approved_teachers = request.form.getlist("teachers")
+            approve_teachers(approved_teachers)
+            teachers = get_teachers_for_approval_names()
+            return render_template("accounts/admin.html", teachers=teachers)
+        else:
+            return redirect(url_for("profile_get"))
     else:
         return redirect(url_for("login_get"))
 

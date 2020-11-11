@@ -5,10 +5,10 @@ from enum import Enum
 class User(GraphObject):
     __primarylabel__ = "user"
     __primarykey__ = "email"
-    student = Label()
-    teacher = Label()
-    teacher_for_approval = Label()
-    admin = Label()
+    student = Label(name="student")
+    teacher = Label(name="teacher")
+    teacher_for_approval = Label(name="teacher_for_approval")
+    admin = Label(name="admin")
     name = Property()
     email = Property()
     password = Property()

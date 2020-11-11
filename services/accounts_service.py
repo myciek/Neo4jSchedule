@@ -65,13 +65,37 @@ def get_profile(usr: str) -> Optional[User]:
     return user_profile
 
 
+def is_admin(usr: str):
+    admin_profile = graph.run(
+        f"MATCH (x:admin) RETURN x.email as email").data()
+    return usr == admin_profile[0]["email"]
+
+
 def get_teachers_names() -> list:
     teachers = graph.run(
-        f"MATCH (x:user:Teacher) RETURN x.name as name"
+        f"MATCH (x:teacher) RETURN x.name as name"
     ).data()
 
     names = [x["name"] for x in teachers]
     return names
+
+
+def get_teachers_for_approval_names() -> list:
+    teachers = graph.run(
+        f"MATCH (x:teacher_for_approval) RETURN x.name as name"
+    ).data()
+
+    names = [x["name"] for x in teachers]
+    return names
+
+
+def approve_teachers(teachers: list):
+    for teacher in teachers:
+        matcher = NodeMatcher(graph)
+        user = matcher.match("user", name=teacher).first()
+        user.remove_label("teacher_for_approval")
+        user.add_label("teacher")
+        graph.push(user)
 
 
 def create_teacher_relationship(lesson_node, teacher):

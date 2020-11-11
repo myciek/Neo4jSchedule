@@ -8,6 +8,7 @@
             {% for info in user_profile %}
                 <input class="form-control" type="text" name="name" placeholder="Imie i Nazwisko" value="{{ info.name }}">
                 <input class="form-control" type="text" name="email" placeholder="Email" value="{{ info.email }}">
+
             {% endfor %}
             <div class="actions">
                 <button type="submit" class="bt btn-info btn-sm">Aktualizuj dane</button>
