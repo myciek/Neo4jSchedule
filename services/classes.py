@@ -13,22 +13,9 @@ class User(GraphObject):
     email = Property()
     password = Property()
     hashed_password = Property()
+    lesson_types = Property()
 
     lessons_own = RelatedFrom("Lesson", "IS_OWNED_BY")
-
-
-class StudiesType(GraphObject):
-    __primarylabel__ = "studies_type"
-    name = Property()
-    abbreviation = Property()
-    type = Property()
-
-
-class TypeEnum(Enum):
-    SSI = 1
-    NSI = 2
-    SSM = 3
-    NSM = 4
 
 
 class FrequencyEnum(Enum):
@@ -36,13 +23,6 @@ class FrequencyEnum(Enum):
     Tygodniowo = 2
     Parzyste = 3
     Nieparzyste = 4
-
-
-class LessonType(GraphObject):
-    __primarylabel__ = "lesson_type"
-    __primarykey__ = "name"
-    name = Property()
-    color = Property()
 
 
 class Lesson(GraphObject):
@@ -55,6 +35,5 @@ class Lesson(GraphObject):
     end_time = Property()
     start_time = Property()
 
-    lesson_type = RelatedTo("LessonType", "IS_TYPE")
     teacher = RelatedTo("User", "IS_TAUGHT_BY")
     studies_type = RelatedTo("StudiesType", "IS_CONDUCTED_FOR")

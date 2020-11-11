@@ -25,6 +25,18 @@ def create_user(name: str, email: str, is_teacher: bool, password: str) -> Optio
     else:
         user.student = True
     user.hashed_password = hash_text(password)
+    user.lessons_types = {
+        "Wykład": "#42A142",
+        "Ćwiczenia": "#094BB9",
+        "Laboratorium": "#E61515",
+        "Projekt": "#ECDC14",
+        "Konsultacje": "#EC8E14",
+        "Seminarium dyplomowe": "#16DB78",
+        "Egzamin": "#6B0B81",
+        "Kolokwium": "#EB1FD8",
+        "Kartkówka": "#0F1A5E",
+        "Sprawozdanie": "#D6D9EB"
+    }
     graph.create(user)
     return user
 

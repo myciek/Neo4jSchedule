@@ -20,10 +20,10 @@ def create_lesson(name: str, lesson_type: str, start_time: str, end_time: str, f
     lesson.frequency = frequency
     lesson.group = group
     lesson.section = section
+    lesson.add_label(studies_type)
+    lesson.add_label(lesson_type)
     graph.create(lesson)
 
-    create_lesson_type_relationship(lesson, lesson_type)
-    create_studies_type_relationship(lesson, studies_type)
     create_teacher_relationship(lesson, teacher)
     create_owner_relationship(lesson, owner)
     return lesson
