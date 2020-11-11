@@ -20,7 +20,10 @@ def create_user(name: str, email: str, is_teacher: bool, password: str) -> Optio
     user = User()
     user.name = name
     user.email = email
-    user.is_teacher = is_teacher
+    if is_teacher:
+        user.teacher_for_approval = True
+    else:
+        user.student = True
     user.hashed_password = hash_text(password)
     graph.create(user)
     return user
@@ -58,17 +61,41 @@ def login_user(email: str, password: str) -> Optional[User]:
 
 def get_profile(usr: str) -> Optional[User]:
     user_profile = graph.run(
-        f"MATCH (x:user) WHERE x.email='{usr}' RETURN x.name as name, x.is_teacher as is_teacher, x.email as email")
+        f"MATCH (x:user) WHERE x.email='{usr}' RETURN x.name as name, x.email as email")
     return user_profile
+
+
+def is_admin(usr: str):
+    admin_profile = graph.run(
+        f"MATCH (x:admin) RETURN x.email as email").data()
+    return usr == admin_profile[0]["email"]
 
 
 def get_teachers_names() -> list:
     teachers = graph.run(
-        f"MATCH (x:user) WHERE x.is_teacher=true RETURN x.name as name"
+        f"MATCH (x:teacher) RETURN x.name as name"
     ).data()
 
     names = [x["name"] for x in teachers]
     return names
+
+
+def get_teachers_for_approval_names() -> list:
+    teachers = graph.run(
+        f"MATCH (x:teacher_for_approval) RETURN x.name as name"
+    ).data()
+
+    names = [x["name"] for x in teachers]
+    return names
+
+
+def approve_teachers(teachers: list):
+    for teacher in teachers:
+        matcher = NodeMatcher(graph)
+        user = matcher.match("user", name=teacher).first()
+        user.remove_label("teacher_for_approval")
+        user.add_label("teacher")
+        graph.push(user)
 
 
 def create_teacher_relationship(lesson_node, teacher):
