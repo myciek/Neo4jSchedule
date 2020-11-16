@@ -2,12 +2,10 @@ from flask import Flask, render_template, redirect, session, url_for, flash, req
 from data.db_session import db_auth
 from services.accounts_service import create_user, login_user, get_profile, update_user, find_user, is_admin, \
     get_teachers_for_approval_names, approve_teachers
-from services.lesson_types_services import create_lesson_type
-from services.lessons_services import get_lesson_initial_info, create_lesson, update_lesson
-from services.classes import TypeEnum, User, Lesson
+from services.lessons_services import get_lesson_initial_info, create_lesson, update_lesson, find_lesson_type
+from services.classes import User, Lesson
 import os
 import json
-from services.studies_types_services import create_studies_type
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -128,7 +126,7 @@ def admin_post():
 def lessons_get():
     if "usr" not in session:
         return redirect(url_for("login_get"))
-    info = get_lesson_initial_info()
+    info = get_lesson_initial_info(session["usr"])
     return render_template("lessons/index.html", info=info)
 
 
@@ -149,33 +147,6 @@ def lessons_post():
     lesson = create_lesson(name, lesson_type, start_time, end_time, frequency, teacher, studies_type, group, section,
                            owner)
     return redirect(url_for("calendar_get"))
-
-
-@app.route('/lessons/studies_type', methods=['GET'])
-def studies_type_get():
-    if "usr" not in session:
-        return redirect(url_for("login_get"))
-    info = {
-        "types": TypeEnum._member_names_
-    }
-    return render_template("lessons/studies_type.html", info=info)
-
-
-@app.route('/lessons/studies_type', methods=['POST'])
-def studies_type_post():
-    if "usr" not in session:
-        return redirect(url_for("login_get"))
-    name = request.form["name"]
-    abbreviation = request.form["abbreviation"]
-    type = request.form["type"]
-    studies_type = create_studies_type(name, abbreviation, type)
-    if not studies_type:
-        flash("Studia takiego typu już istnieją")
-        info = {
-            "types": TypeEnum._member_names_
-        }
-        return render_template("lessons/studies_type.html", info=info)
-    return redirect(url_for("lessons_get"))
 
 
 @app.route('/lessons/lesson_type', methods=['GET'])
@@ -210,41 +181,38 @@ def data_get():
     data = []
     user = User.match(graph, session["usr"]).first()
     lessons = user.lessons_own
+    lesson_types = json.loads(user.lesson_types)
     for lesson in lessons:
-        for lesson_type in lesson.lesson_type:
-            lesson_data = {
-                "title": f"{lesson.name} {lesson_type.name}",
-                "start": lesson.start_time,
-                "end": lesson.end_time,
-                "color": lesson_type.color,
-                "url": f"http://127.0.0.1:5000/lessons/{lesson.__primaryvalue__}"
-            }
-            data.append(lesson_data)
+        lesson_type = find_lesson_type(lesson_types, lesson.__ogm__.node)
+        lesson_data = {
+            "title": f"{lesson.name} {lesson_type}",
+            "start": lesson.start_time,
+            "end": lesson.end_time,
+            "color": lesson_types[lesson_type],
+            "url": f"http://127.0.0.1:5000/lessons/{lesson.__primaryvalue__}"
+        }
+        data.append(lesson_data)
 
     return json.dumps(data)
 
 
 @app.route('/lessons/<id>', methods=['GET'])
-def lesson_detais_get(id):
+def lesson_details_get(id):
     if "usr" not in session:
         return redirect(url_for("login_get"))
     lesson = Lesson.match(graph, int(id)).first()
-    info = get_lesson_initial_info()
+    user = User.match(graph, session["usr"]).first()
+    info = get_lesson_initial_info(session["usr"])
     info["name"] = lesson.name
     info["start_time"] = lesson.start_time
     info["end_time"] = lesson.end_time
     info["group"] = lesson.group
     info["section"] = lesson.section
     info["selected_frequency"] = lesson.frequency
-
-    for lesson_type in lesson.lesson_type:
-        info["selected_lesson_type"] = lesson_type.name
+    info["selected_lesson_type"] = find_lesson_type(json.loads(user.lesson_types), lesson.__ogm__.node)
 
     for teacher in lesson.teacher:
         info["selected_teacher"] = teacher.name
-
-    for studies_type in lesson.studies_type:
-        info["selected_studies_type"] = f"{studies_type.abbreviation} {studies_type.type}"
 
     return render_template("lessons/lesson_details.html", info=info)
 
@@ -259,12 +227,11 @@ def lesson_details_post(id):
     end_time = request.form["end_time"]
     frequency = request.form["frequency"]
     teacher = request.form["teacher"]
-    studies_type = request.form["studies_type"]
     group = request.form["group"]
     section = request.form["section"]
 
-    lesson = update_lesson(name, lesson_type, start_time, end_time, frequency, teacher, studies_type, group, section,
-                           id)
+    lesson = update_lesson(name, start_time, end_time, frequency, teacher, group, section,
+                           lesson_type, session["usr"], id)
     return redirect(url_for("calendar_get"))
 
 

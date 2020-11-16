@@ -30,13 +30,7 @@
                         <option value="{{ type }}">{{ type }}</option>
                     {% endfor %}
                 </select>
-                <select class="form-control" id="studies_type" name="studies_type">
-                    <option value="" disabled selected>Kierunek studiów</option>
-                    {% for type in info.studies_types %}
-                        <option value="{{ type }}">{{ type }}</option>
-                    {% endfor %}
-                </select>
-                <a class="form-control" href="/lessons/studies_type">Dodaj kierunek studiów</a>
+                <input class="form-control" type="text"  placeholder="Kierunek studiow" name="studies_type" required value="{{ studies_type }}">
                 <input class="form-control" type="text" name="group" placeholder="Grupa" required value="{{ group }}">
                 <input class="form-control" type="text" name="section" placeholder="Sekcja" required
                        value="{{ section }}">
