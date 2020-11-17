@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, session, url_for, flash, req
 from data.db_session import db_auth
 from services.accounts_service import create_user, login_user, get_profile, update_user, find_user, is_admin, \
     get_teachers_for_approval_names, approve_teachers
+from services.lesson_types_service import create_lesson_type
 from services.lessons_services import get_lesson_initial_info, create_lesson, update_lesson, find_lesson_type
 from services.classes import User, Lesson
 import os
@@ -162,7 +163,7 @@ def lesson_type_post():
         return redirect(url_for("login_get"))
     name = request.form["name"]
     color = request.form["color"]
-    lesson_type = create_lesson_type(name, color)
+    lesson_type = create_lesson_type(name, color, session["usr"])
     if not lesson_type:
         flash("Nazwa i kolor muszą być unikalne")
         return render_template("lessons/lesson_type.html")
