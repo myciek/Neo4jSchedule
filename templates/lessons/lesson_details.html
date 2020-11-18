@@ -38,15 +38,6 @@
                             {% endif %}
                         {% endfor %}
                     </select>
-                    <select class="form-control" id="studies_type" name="studies_type">
-                        <option value="{{ info.selected_studies_type }}" selected>{{ info.selected_studies_type }}</option>
-                        {% for type in info.studies_types %}
-                            {% if type != info.selected_studies_type %}
-                            <option value="{{ type }}">{{ type }}</option>
-                            {% endif %} }}
-                        {% endfor %}
-                    </select>
-                    <a class="form-control" href="/lessons/studies_type">Dodaj kierunek studiów</a>
                     <input class="form-control" type="text" name="group" placeholder="Grupa"
                            value="{{ info.group }}">
                     <input class="form-control" type="text" name="section" placeholder="Sekcja"

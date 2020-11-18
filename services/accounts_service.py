@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
@@ -25,6 +26,18 @@ def create_user(name: str, email: str, is_teacher: bool, password: str) -> Optio
     else:
         user.student = True
     user.hashed_password = hash_text(password)
+    user.lesson_types = json.dumps({
+        "Wykład": "#42A142",
+        "Ćwiczenia": "#094BB9",
+        "Laboratorium": "#E61515",
+        "Projekt": "#ECDC14",
+        "Konsultacje": "#EC8E14",
+        "Seminarium dyplomowe": "#16DB78",
+        "Egzamin": "#6B0B81",
+        "Kolokwium": "#EB1FD8",
+        "Kartkówka": "#0F1A5E",
+        "Sprawozdanie": "#D6D9EB"
+    })
     graph.create(user)
     return user
 
@@ -100,7 +113,7 @@ def approve_teachers(teachers: list):
 
 def create_teacher_relationship(lesson_node, teacher):
     teacher_node = graph.run(f"MATCH (x:user) WHERE x.name='{teacher}' RETURN x").data()
-    relationship = Relationship(lesson_node.__ogm__.node, "IS_TAUGHT_BY", teacher_node[0]["x"])
+    relationship = Relationship(lesson_node, "IS_TAUGHT_BY", teacher_node[0]["x"])
     graph.create(relationship)
 
 

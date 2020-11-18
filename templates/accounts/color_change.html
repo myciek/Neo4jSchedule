@@ -1,0 +1,40 @@
+{% extends "shared/_layout.html" %}
+{% block title %}Edytuj rodzaj zajęć{% endblock %}
+{% block main_content %}
+    <div class="main">
+        <div class="form-wrapper">
+            <form method="POST">
+                <h2>Zmien kolor rodzaju zajęć</h2>
+                <select class="form-control" id="name" name="name">
+                    <option value="" disabled selected>Rodzaj zajec</option>
+                    {% for name in info.keys() %}
+                        <option value="{{ info[name] }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+                <input class="form-control" type="color" name="color" id="color">
+                <div class="actions">
+                    <button type="submit" class="bt btn-info btn-sm">Zmien kolor</button>
+                </div>
+                <div class="error-msg">
+                    {% if error %}
+                        <div class="error-msg">{{ error }}</div>
+                    {% endif %}
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for msg in messages %}
+                                <p>{{ msg }}</p>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+        const select = document.querySelector("#name")
+        const color = document.querySelector("#color")
+        select.addEventListener("change", function (event) {
+            color.value = event.target.value
+        })
+    </script>
+{% endblock %}
