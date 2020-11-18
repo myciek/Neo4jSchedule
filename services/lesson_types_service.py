@@ -3,7 +3,6 @@ import json
 from py2neo import NodeMatcher
 
 from data.db_session import db_auth
-from services.classes import User
 
 graph = db_auth()
 

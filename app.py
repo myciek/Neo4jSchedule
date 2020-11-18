@@ -1,4 +1,6 @@
 from flask import Flask, render_template, redirect, session, url_for, flash, request
+from py2neo import NodeMatcher
+
 from data.db_session import db_auth
 from services.accounts_service import create_user, login_user, get_profile, update_user, find_user, is_admin, \
     get_teachers_for_approval_names, approve_teachers
@@ -121,6 +123,30 @@ def admin_post():
             return redirect(url_for("profile_get"))
     else:
         return redirect(url_for("login_get"))
+
+
+@app.route('/accounts/lesson_types', methods=['GET'])
+def change_lesson_type_color_get():
+    if "usr" in session:
+        matcher = NodeMatcher(graph)
+        user = matcher.match("user", email=session["usr"]).first()
+        info = json.loads(user["lesson_types"])
+        return render_template("accounts/color_change.html", info=info)
+    return redirect(url_for("login_get"))
+
+
+@app.route('/accounts/lesson_types', methods=['POST'])
+def change_lesson_type_color_post():
+    if "usr" in session:
+        matcher = NodeMatcher(graph)
+        user = matcher.match("user", email=session["usr"]).first()
+        lesson_types = json.loads(user["lesson_types"])
+        key_to_change = next((name for name, color in lesson_types.items() if color == request.form["name"]), None)
+        lesson_types[key_to_change] = request.form["color"]
+        user["lesson_types"] = json.dumps(lesson_types)
+        graph.push(user)
+        return redirect(url_for("change_lesson_type_color_get"))
+    return redirect(url_for("login_get"))
 
 
 @app.route('/lessons', methods=['GET'])
