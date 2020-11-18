@@ -162,15 +162,20 @@ def lessons_post():
     if "usr" not in session:
         return redirect(url_for("login_get"))
     name = request.form["name"]
-    lesson_type = request.form["lesson_type"]
+    lesson_type = request.form.get("lesson_type")
     start_time = request.form["start_time"]
     end_time = request.form["end_time"]
-    frequency = request.form["frequency"]
-    teacher = request.form["teacher"]
+    frequency = request.form.get("frequency")
+    teacher = request.form.get("teacher")
     studies_type = request.form["studies_type"]
     group = request.form["group"]
     section = request.form["section"]
     owner = session["usr"]
+    if not lesson_type or not frequency or not teacher:
+        flash("Wybierz element z każdej listy!")
+        info = get_lesson_initial_info(session["usr"])
+        return render_template("lessons/index.html", info=info, name=name, start_time=start_time, end_time=end_time,
+                               group=group, section=section, studies_type=studies_type)
     lesson = create_lesson(name, lesson_type, start_time, end_time, frequency, teacher, studies_type, group, section,
                            owner)
     return redirect(url_for("calendar_get"))
