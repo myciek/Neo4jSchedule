@@ -2,10 +2,10 @@ from flask import Flask, render_template, redirect, session, url_for, flash, req
 from py2neo import NodeMatcher
 
 from data.db_session import db_auth
-from services.accounts_service import create_user, login_user, get_profile, update_user, find_user, is_admin, \
+from services.accounts_service import create_user, login_user, get_profile, update_user, is_admin, \
     get_teachers_for_approval_names, approve_teachers
-from services.lesson_types_service import create_lesson_type
-from services.lessons_services import get_lesson_initial_info, create_lesson, update_lesson, find_lesson_type
+from services.lessons_services import get_lesson_initial_info, create_lesson, update_lesson, find_lesson_type, \
+    get_lessons_list, add_lesson_to_user
 from services.classes import User, Lesson
 import os
 import json
@@ -181,26 +181,6 @@ def lessons_post():
     return redirect(url_for("calendar_get"))
 
 
-@app.route('/lessons/lesson_type', methods=['GET'])
-def lesson_type_get():
-    if "usr" not in session:
-        return redirect(url_for("login_get"))
-    return render_template("lessons/lesson_type.html")
-
-
-@app.route('/lessons/lesson_type', methods=['POST'])
-def lesson_type_post():
-    if "usr" not in session:
-        return redirect(url_for("login_get"))
-    name = request.form["name"]
-    color = request.form["color"]
-    lesson_type = create_lesson_type(name, color, session["usr"])
-    if not lesson_type:
-        flash("Nazwa i kolor muszą być unikalne")
-        return render_template("lessons/lesson_type.html")
-    return redirect(url_for("lessons_get"))
-
-
 @app.route('/calendar', methods=['GET'])
 def calendar_get():
     if "usr" not in session:
@@ -221,7 +201,7 @@ def data_get():
             "start": lesson.start_time,
             "end": lesson.end_time,
             "color": lesson_types[lesson_type],
-            "url": f"http://127.0.0.1:5000/lessons/{lesson.__primaryvalue__}"
+            "url": url_for("lessons_get") + str(lesson.__primaryvalue__)
         }
         data.append(lesson_data)
 
@@ -265,6 +245,27 @@ def lesson_details_post(id):
     lesson = update_lesson(name, start_time, end_time, frequency, teacher, group, section,
                            lesson_type, session["usr"], id)
     return redirect(url_for("calendar_get"))
+
+
+@app.route('/lessons/all', methods=["GET"])
+def lessons_all_get():
+    if "usr" not in session:
+        return redirect(url_for("login_get"))
+    lessons_list = get_lessons_list(session["usr"])
+    return render_template("lessons/lesson_list.html", info=lessons_list)
+
+
+@app.route('/lessons/add', methods=["GET"])
+def lessons_add():
+    pass
+
+
+@app.route('/lessons/add/<id>', methods=["GET"])
+def lessons_add_to_user(id):
+    if "usr" not in session:
+        return redirect(url_for("login_get"))
+    add_lesson_to_user(id, session["usr"])
+    return redirect(url_for("lessons_get"))
 
 
 @app.route('/accounts/logout')

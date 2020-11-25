@@ -13,10 +13,10 @@
                         <option value="{{ type }}">{{ type }}</option>
                     {% endfor %}
                 </select>
-                <a class="form-control" href="/lessons/lesson_type">Dodaj rodzaj zajęć</a>
                 <input class="form-control" type="datetime-local" name="start_time" placeholder="Godzina rozpoczęcia"
                        required value="{{ start_time }}">
-                <input class="form-control" type="datetime-local" name="end_time" placeholder="Godzina zakończenia" required
+                <input class="form-control" type="datetime-local" name="end_time" placeholder="Godzina zakończenia"
+                       required
                        value="{{ end_time }}">
                 <select class="form-control" id="frequency" name="frequency">
                     <option value="" disabled selected>Występowanie</option>
@@ -30,13 +30,16 @@
                         <option value="{{ type }}">{{ type }}</option>
                     {% endfor %}
                 </select>
-                <input class="form-control" type="text"  placeholder="Kierunek studiow" name="studies_type" required value="{{ studies_type }}">
+                <input class="form-control" type="text" placeholder="Kierunek studiow" name="studies_type" required
+                       value="{{ studies_type }}">
                 <input class="form-control" type="text" name="group" placeholder="Grupa" required value="{{ group }}">
                 <input class="form-control" type="text" name="section" placeholder="Sekcja" required
                        value="{{ section }}">
                 <div class="actions">
                     <button type="submit" class="bt btn-info btn-sm">Dodaj zajęcia</button>
                 </div>
+                <br>
+                <a class="form-control" href="/lessons/all"> Lub wybierz zajecie z listy</a>
                 <div class="error-msg">
                     {% if error %}
                         <div class="error-msg">{{ error }}</div>

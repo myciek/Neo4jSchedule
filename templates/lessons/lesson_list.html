@@ -1,0 +1,31 @@
+{% extends "shared/_layout.html" %}
+{% block title %}Lista zajec{% endblock %}
+{% block main_content %}
+    <div class="main">
+        <h2>Lista zajec</h2>
+        <table>
+            <tr>
+                <th>Nazwa</th>
+                <th>Typ zajec</th>
+                <th>Czas rozpoczecia</th>
+                <th>Czas zakonczenia</th>
+                <th>Wystepowanie</th>
+                <th>Prowadzacy</th>
+                <th>Grupa</th>
+                <th>Sekcja</th>
+                <th>Dodaj zajęcia</th>
+            </tr>
+            {% for item in info %}
+                <tr>
+                    {% for key,value in item.items() %}
+                        {% if key != "add" %}
+                        <td>{{ value }}</td>
+                        {% else %}
+                        <td><a href={{ value }}>Dodaj</a></td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}
