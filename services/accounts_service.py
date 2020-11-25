@@ -10,13 +10,8 @@ from services.classes import User
 graph = db_auth()
 
 
-def find_user(email: str):
-    user = User.match(graph, f"{email}")
-    return user
-
-
 def create_user(name: str, email: str, is_teacher: bool, password: str) -> Optional[User]:
-    if find_user(email):
+    if User.match(graph, f"{email}"):
         return None
     user = User()
     user.name = name

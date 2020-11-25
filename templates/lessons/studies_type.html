@@ -7,14 +7,15 @@
                 <h2>Dodaj kierunek studiów</h2>
                 <input class="form-control" type="text" name="name" placeholder="Nazwa" required
                        value="{{ name }}">
-                <input class="form-control" type="text" name="abbreviation" placeholder="Skrót nazwy" required value="{{ abbreviation }}">
+                <input class="form-control" type="text" name="abbreviation" placeholder="Skrót nazwy" required
+                       value="{{ abbreviation }}">
                 <select class="form-control" id="type" name="type">
                     <option value="" disabled selected>Typ studiów</option>
                     {% for type in info.types %}
                         <option value="{{ type }}">{{ type }}</option>
                     {% endfor %}
                 </select>
-<div class="actions">
+                <div class="actions">
                     <button type="submit" class="bt btn-info btn-sm">Dodaj kierunek studiów</button>
                 </div>
                 <div class="error-msg">

@@ -5,43 +5,43 @@
         <div class="form-wrapper">
             <form method="POST">
                 <h2>Szczegóły</h2>
-                    <input class="form-control" type="text" name="name" placeholder="Nazwa zajęć"
-                           value="{{ info.name }}">
-                    <select class="form-control" id="lesson_type" name="lesson_type">
-                        <option value="{{ info.selected_lesson_type }}" selected>{{info.selected_lesson_type}}</option>
-                        {% for type in info.lesson_types %}
-                            {% if type != info.selected_lesson_type %}
+                <input class="form-control" type="text" name="name" placeholder="Nazwa zajęć"
+                       value="{{ info.name }}">
+                <select class="form-control" id="lesson_type" name="lesson_type">
+                    <option value="{{ info.selected_lesson_type }}" selected>{{ info.selected_lesson_type }}</option>
+                    {% for type in info.lesson_types %}
+                        {% if type != info.selected_lesson_type %}
                             <option value="{{ type }}">{{ type }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <a class="form-control" href="/lessons/lesson_type">Dodaj rodzaj zajęć</a>
-                    <input class="form-control" type="datetime-local" name="start_time"
-                           placeholder="Godzina rozpoczęcia"
-                           value="{{ info.start_time }}">
-                    <input class="form-control" type="datetime-local" name="end_time" placeholder="Godzina zakończenia"
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <a class="form-control" href="/lessons/lesson_type">Dodaj rodzaj zajęć</a>
+                <input class="form-control" type="datetime-local" name="start_time"
+                       placeholder="Godzina rozpoczęcia"
+                       value="{{ info.start_time }}">
+                <input class="form-control" type="datetime-local" name="end_time" placeholder="Godzina zakończenia"
 
-                           value="{{ info.end_time }}">
-                    <select class="form-control" id="frequency" name="frequency">
-                        <option value="{{ info.selected_frequency }}" selected>{{info.selected_frequency }}</option>
-                        {% for type in info.frequency %}
-                            {% if type != info.selected_frequency %}
+                       value="{{ info.end_time }}">
+                <select class="form-control" id="frequency" name="frequency">
+                    <option value="{{ info.selected_frequency }}" selected>{{ info.selected_frequency }}</option>
+                    {% for type in info.frequency %}
+                        {% if type != info.selected_frequency %}
                             <option value="{{ type }}">{{ type }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <select class="form-control" id="teacher" name="teacher">
-                        <option value="{{ info.selected_teacher }}" selected>{{info.selected_teacher}}</option>
-                        {% for type in info.teachers %}
-                            {% if type != info.selected_teacher %}
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <select class="form-control" id="teacher" name="teacher">
+                    <option value="{{ info.selected_teacher }}" selected>{{ info.selected_teacher }}</option>
+                    {% for type in info.teachers %}
+                        {% if type != info.selected_teacher %}
                             <option value="{{ type }}">{{ type }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    <input class="form-control" type="text" name="group" placeholder="Grupa"
-                           value="{{ info.group }}">
-                    <input class="form-control" type="text" name="section" placeholder="Sekcja"
-                           value="{{ info.section }}">
+                        {% endif %}
+                    {% endfor %}
+                </select>
+                <input class="form-control" type="text" name="group" placeholder="Grupa"
+                       value="{{ info.group }}">
+                <input class="form-control" type="text" name="section" placeholder="Sekcja"
+                       value="{{ info.section }}">
                 <div class="actions">
                     <button type="submit" class="bt btn-info btn-sm">Zmień szczegóły</button>
                 </div>

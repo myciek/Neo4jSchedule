@@ -1,6 +1,7 @@
 import json
 from typing import Optional
 
+from flask import url_for
 from py2neo import Relationship, NodeMatcher, Node
 from py2neo.ogm import Label
 
@@ -65,6 +66,7 @@ def get_lesson_initial_info(usr: str) -> dict:
 
 
 def find_lesson_type(lesson_types: dict, lesson: Node) -> str:
+    lesson_type = None
     for label in lesson_types.keys():
         if lesson.has_label(label):
             lesson_type = label
@@ -78,3 +80,31 @@ def change_lesson_type(lesson_type: str, lesson: Lesson, usr: str) -> Lesson:
     lesson.remove_label(find_lesson_type(json.loads(user.lesson_types), lesson))
     lesson.add_label(lesson_type)
     return lesson
+
+
+def get_lessons_list(usr: str) -> list:
+    other_users_lessons = graph.run(
+        f"MATCH(x:lesson), (y:user) WHERE y.email='{usr}'AND NOT (x)-[:IS_OWNED_BY]-(y) RETURN x as lessons, ID(x) as id").data()
+    user = User.match(graph, usr).first()
+    lesson_list = []
+    for item in other_users_lessons:
+        lesson = item["lessons"]
+        lesson_list.append(
+            {
+                "name": lesson["name"],
+                "type": find_lesson_type(json.loads(user.lesson_types), lesson),
+                "start_time": lesson["start_time"],
+                "end_time": lesson["end_time"],
+                "frequency": lesson["frequency"],
+                "teacher": lesson["teacher"],
+                "group": lesson["group"],
+                "section": lesson["section"],
+                "add": url_for("lessons_add") + "/" + str(item["id"])
+            }
+        )
+    return lesson_list
+
+
+def add_lesson_to_user(id: str, usr: str):
+    lesson = Lesson.match(graph, int(id)).first()
+    create_owner_relationship(lesson, usr)
