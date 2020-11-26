@@ -99,7 +99,7 @@ def get_lessons_list(usr: str) -> list:
                 "teacher": lesson["teacher"],
                 "group": lesson["group"],
                 "section": lesson["section"],
-                "add": url_for("lessons_add") + "/" + str(item["id"])
+                "add": url_for("lessons_add_to_user", id=item["id"])
             }
         )
     return lesson_list
