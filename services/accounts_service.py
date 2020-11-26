@@ -16,6 +16,7 @@ def create_user(name: str, email: str, is_teacher: bool, password: str) -> Optio
     user = User()
     user.name = name
     user.email = email
+    user.active = False
     if is_teacher:
         user.teacher_for_approval = True
     else:
@@ -62,6 +63,9 @@ def login_user(email: str, password: str) -> Optional[User]:
         return None
     if not verify_hash(user.hashed_password, password):
         print(f"Invalid Password for {email}")
+        return None
+    if not user.active:
+        print(f"{email} is not active")
         return None
     print(f"User {email} passed authentication")
     return user

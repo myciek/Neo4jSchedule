@@ -14,6 +14,7 @@ class User(GraphObject):
     password = Property()
     hashed_password = Property()
     lesson_types = Property()
+    active = Property()
 
     lessons_own = RelatedFrom("Lesson", "IS_OWNED_BY")
 

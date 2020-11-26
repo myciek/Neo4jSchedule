@@ -4,15 +4,56 @@ from py2neo import NodeMatcher
 from data.db_session import db_auth
 from services.accounts_service import create_user, login_user, get_profile, update_user, is_admin, \
     get_teachers_for_approval_names, approve_teachers
-from services.lessons_services import get_lesson_initial_info, create_lesson, update_lesson, find_lesson_type, \
+from services.lessons_service import get_lesson_initial_info, create_lesson, update_lesson, find_lesson_type, \
     get_lessons_list, add_lesson_to_user
 from services.classes import User, Lesson
 import os
 import json
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+app.config["SECURITY_PASSWORD_SALT"] = os.urandom(24)
+app.config["MAIL_DEFAULT_SENDER"] = "podwoozka@gmail.com"
+app.config["MAIL_SERVER"] = "smtp.gmail.com"
+app.config["MAIL_PORT"] = 465
+app.config["MAIL_USE_TLS"] = False
+app.config["MAIL_USE_SSL"] = True
+app.config["MAIL_USERNAME"] ="yourmail"
+app.config["MAIL_PASSWORD"] = "your password"
+
+mail = Mail(app)
 graph = db_auth()
+
+
+def generate_confirmation_token(email):
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    return serializer.dumps(email, salt=app.config['SECURITY_PASSWORD_SALT'])
+
+
+def confirm_token(token, expiration=3600):
+    serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    try:
+        email = serializer.loads(
+            token,
+            salt=app.config['SECURITY_PASSWORD_SALT'],
+            max_age=expiration
+        )
+    except:
+        return False
+    return email
+
+
+def send_email(to, subject, template):
+    msg = Message(
+        subject,
+        recipients=[to],
+        html=template,
+        sender=app.config["MAIL_DEFAULT_SENDER"]
+    )
+    mail.send(msg)
+    print("wyslane")
 
 
 @app.route('/')
@@ -46,7 +87,27 @@ def register_post():
     if not user:
         flash("A user with that email already exists.")
         return render_template("accounts/register.html", name=name, email=email, is_teacher=is_teacher)
+    token = generate_confirmation_token(email)
+    confirm_url = url_for("confirm_email_get", token=token, _external=True)
+    html = render_template("accounts/email.html", confirm_url=confirm_url)
+    send_email(email, "Potwierdz adres email", html)
+
     return render_template("accounts/register.html")
+
+
+@app.route('/accounts/confirm/<token>', methods=['GET'])
+def confirm_email_get(token):
+    try:
+        email = confirm_token(token)
+    except:
+        flash("Link aktywacyjny jest nieprawidlowy lub wygasl.")
+    user = User.match(graph, f"{email}").first()
+    if user.active:
+        flash("Konto juz aktywowane.")
+    else:
+        user.active = True
+        graph.push(user)
+    return redirect(url_for("login_get"))
 
 
 @app.route('/accounts/login', methods=['GET'])
@@ -65,7 +126,8 @@ def login_post():
         return render_template("accounts/login.html", email=email, password=password)
     user = login_user(email, password)
     if not user:
-        flash("No account for that email address or the password is incorrect", "error")
+        flash("Nie znaleziono aktywnego konta z takimi danymi, spróbuj potwierdzic email lub wpisać inne dane.",
+              "error")
         return render_template("accounts/login.html", email=email, password=password)
     usr = request.form["email"]
     session["usr"] = usr
@@ -253,11 +315,6 @@ def lessons_all_get():
         return redirect(url_for("login_get"))
     lessons_list = get_lessons_list(session["usr"])
     return render_template("lessons/lesson_list.html", info=lessons_list)
-
-
-@app.route('/lessons/add', methods=["GET"])
-def lessons_add():
-    pass
 
 
 @app.route('/lessons/add/<id>', methods=["GET"])

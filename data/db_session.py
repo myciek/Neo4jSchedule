@@ -1,4 +1,6 @@
 from py2neo import Graph
+
+
 def db_auth():
     user = 'neo4j'
     pword = '123qwe'
