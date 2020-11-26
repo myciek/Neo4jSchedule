@@ -7,12 +7,12 @@ from py2neo.ogm import Label
 
 from data.db_session import db_auth
 from .accounts_service import get_teachers_names, create_teacher_relationship, create_owner_relationship
-from .classes import FrequencyEnum, Lesson, User
+from .classes import FrequencyEnum, Lesson, User, BlockEnum
 
 graph = db_auth()
 
 
-def create_lesson(name: str, lesson_type: str, start_time: str, end_time: str, frequency: str, teacher: str,
+def create_lesson(name: str, lesson_type: str, start_time: str, end_time: str, frequency: str, block: str, teacher: str,
                   studies_type: str, group: str, section: str, owner: str) -> Optional[Lesson]:
     lesson = Lesson()
     lesson.name = name
@@ -27,6 +27,7 @@ def create_lesson(name: str, lesson_type: str, start_time: str, end_time: str, f
     created_lesson = matcher.match("lesson", name=name).first()
     created_lesson.add_label(studies_type)
     created_lesson.add_label(lesson_type)
+    created_lesson.add_label(block)
     graph.push(created_lesson)
     create_teacher_relationship(lesson.__ogm__.node, teacher)
     create_owner_relationship(lesson, owner)
@@ -61,6 +62,7 @@ def get_lesson_initial_info(usr: str) -> dict:
         "lesson_types": json.loads(user["lesson_types"]).keys(),
         "teachers": get_teachers_names(),
         "frequency": FrequencyEnum._member_names_,
+        "blocks": BlockEnum._member_names_
     }
     return info
 
