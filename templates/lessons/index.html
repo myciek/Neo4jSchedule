@@ -24,6 +24,12 @@
                         <option value="{{ type }}">{{ type }}</option>
                     {% endfor %}
                 </select>
+                <select class="form-control" id="block" name="block">
+                    <option value="" disabled selected>Blok</option>
+                    {% for type in info.blocks %}
+                        <option value="{{ type }}">{{ type }}</option>
+                    {% endfor %}
+                </select>
                 <select class="form-control" id="teacher" name="teacher">
                     <option value="" disabled selected>Prowadzący</option>
                     {% for type in info.teachers %}

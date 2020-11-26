@@ -228,17 +228,18 @@ def lessons_post():
     start_time = request.form["start_time"]
     end_time = request.form["end_time"]
     frequency = request.form.get("frequency")
+    block = request.form.get("block")
     teacher = request.form.get("teacher")
     studies_type = request.form["studies_type"]
     group = request.form["group"]
     section = request.form["section"]
     owner = session["usr"]
-    if not lesson_type or not frequency or not teacher:
+    if not lesson_type or not frequency or not teacher or not block:
         flash("Wybierz element z każdej listy!")
         info = get_lesson_initial_info(session["usr"])
         return render_template("lessons/index.html", info=info, name=name, start_time=start_time, end_time=end_time,
                                group=group, section=section, studies_type=studies_type)
-    lesson = create_lesson(name, lesson_type, start_time, end_time, frequency, teacher, studies_type, group, section,
+    lesson = create_lesson(name, lesson_type, start_time, end_time, frequency, block, teacher, studies_type, group, section,
                            owner)
     return redirect(url_for("calendar_get"))
 

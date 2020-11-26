@@ -25,6 +25,11 @@ class FrequencyEnum(Enum):
     Parzyste = 3
     Nieparzyste = 4
 
+class BlockEnum(Enum):
+    Blok1 = 1
+    Blok2 = 2
+    Blok3 = 3
+
 
 class Lesson(GraphObject):
     __primarylabel__ = "lesson"
@@ -32,9 +37,7 @@ class Lesson(GraphObject):
     frequency = Property()
     section = Property()
     group = Property()
-    studies_type = Property()
     end_time = Property()
     start_time = Property()
 
     teacher = RelatedTo("User", "IS_TAUGHT_BY")
-    studies_type = RelatedTo("StudiesType", "IS_CONDUCTED_FOR")
