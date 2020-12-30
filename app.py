@@ -140,7 +140,6 @@ def profile_get():
         usr = session["usr"]
         if is_admin(usr):
             return redirect(url_for("admin_get"))
-        session["usr"] = usr
         user_profile = get_profile(usr)
         return render_template("accounts/index.html", user_profile=user_profile)
     else:
@@ -264,7 +263,7 @@ def data_get():
             "start": lesson.start_time,
             "end": lesson.end_time,
             "color": lesson_types[lesson_type],
-            "url": url_for("lessons_get") + str(lesson.__primaryvalue__)
+            "url": url_for("lessons_get") + "/" + str(lesson.__primaryvalue__),
         }
         data.append(lesson_data)
 

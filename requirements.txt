@@ -1,6 +1,6 @@
 itsdangerous
-
 py2neo
 werkzeug
 flask
 passlib
+pytest
